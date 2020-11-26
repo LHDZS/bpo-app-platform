@@ -1,0 +1,39 @@
+import axios from 'axios'
+import VueCookies from 'vue-cookies'
+import QS from 'qs'
+// import router from '../router/index'
+
+export function get (url, params) {
+  return new Promise((resolve, reject) => {
+    axios.get(url, {
+      params: params
+    }).then(res => {
+      resolve(res.data)
+    }).catch(err => {
+      reject(err.data)
+    })
+  })
+}
+
+export function post (url, params) {
+  return new Promise((resolve, reject) => {
+    axios.post(url, params || {}, {
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': VueCookies.get('esignplatformsid')
+      }
+    })
+      .then(res => {
+        if (res.data.status && res.data.status === -99) {
+            console.log('重新登录')
+            router.push({ path: '/login' })
+            console.log(res.data.message)
+        }
+        resolve(res.data)
+      })
+      .catch(err => {
+        // console.log('接口提示', err.data.message)
+        reject(err.data)
+      })
+  })
+}
